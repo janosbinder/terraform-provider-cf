@@ -3,18 +3,17 @@ package repo
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"os"
-	"path/filepath"
 	"sync"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 
-	git "gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
+	"io/ioutil"
 )
 
 // VersionType -
@@ -33,16 +32,13 @@ type Repository interface {
 
 // RepoManager -
 type RepoManager struct {
-	workspace string
-
 	gitMutex *sync.Mutex
 }
 
 // NewRepoManager -
-func NewRepoManager(workspace string) *RepoManager {
+func NewRepoManager() *RepoManager {
 	return &RepoManager{
-		workspace: workspace,
-		gitMutex:  &sync.Mutex{},
+		gitMutex: &sync.Mutex{},
 	}
 }
 
@@ -54,57 +50,47 @@ func (rm *RepoManager) GetGitRepository(repoURL string, user, password, privateK
 
 	var r *git.Repository
 
-	urlPath, err := url.Parse(repoURL)
+	p, err := ioutil.TempDir("", "terraform-provider-cf")
 	if err != nil {
 		return
 	}
 
-	baseName := filepath.Base(urlPath.Path)
-	extName := filepath.Ext(urlPath.Path)
-	p := fmt.Sprintf("%s/%s", rm.workspace, baseName[:len(baseName)-len(extName)])
+	if user != nil {
 
-	if _, err = os.Stat(p); os.IsNotExist(err) {
-		err = nil
+		var auth transport.AuthMethod
 
-		if user != nil {
+		if password != nil {
 
-			var auth transport.AuthMethod
-
-			if password != nil {
-
-				if privateKey != nil {
-					auth, err = ssh.NewPublicKeys(*user, []byte(*privateKey), *password)
-				} else {
-					auth = &ssh.Password{
-						User: *user,
-						Pass: *password,
-					}
-				}
-			} else if privateKey != nil {
-				auth, err = ssh.NewPublicKeys(*user, []byte(*privateKey), "")
+			if privateKey != nil {
+				auth, err = ssh.NewPublicKeys(*user, []byte(*privateKey), *password)
 			} else {
-				err = fmt.Errorf("authentication password or key was not provided for user '%s'\n", *user)
+				auth = &ssh.Password{
+					User: *user,
+					Pass: *password,
+				}
 			}
-			if err != nil {
-				return
-			}
-			r, err = git.PlainClone(p, false,
-				&git.CloneOptions{
-					URL:               repoURL,
-					Auth:              auth,
-					ReferenceName:     plumbing.Master,
-					RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
-				})
+		} else if privateKey != nil {
+			auth, err = ssh.NewPublicKeys(*user, []byte(*privateKey), "")
 		} else {
-			r, err = git.PlainClone(p, false,
-				&git.CloneOptions{
-					URL:               repoURL,
-					ReferenceName:     plumbing.Master,
-					RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
-				})
+			err = fmt.Errorf("authentication password or key was not provided for user '%s'\n", *user)
 		}
+		if err != nil {
+			return
+		}
+		r, err = git.PlainClone(p, false,
+			&git.CloneOptions{
+				URL:               repoURL,
+				Auth:              auth,
+				ReferenceName:     plumbing.Master,
+				RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+			})
 	} else {
-		r, err = git.PlainOpen(p)
+		r, err = git.PlainClone(p, false,
+			&git.CloneOptions{
+				URL:               repoURL,
+				ReferenceName:     plumbing.Master,
+				RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+			})
 	}
 	if err != nil {
 		os.RemoveAll(p)
@@ -140,8 +126,8 @@ func (rm *RepoManager) GetGithubRelease(ghOwner, ghRepoName, archiveName string,
 		return
 	}
 
-	path := rm.workspace + "/github_releases/" + ghOwner + "/" + ghRepoName
-	if err = os.MkdirAll(path, os.ModePerm); err != nil {
+	path, err := ioutil.TempDir("", "terraform-provider-cf")
+	if err != nil {
 		return
 	}
 
