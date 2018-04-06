@@ -1,14 +1,14 @@
 ---
 layout: "cf"
-page_title: "Cloud Foundry: cf_quota"
-sidebar_current: "docs-cf-resource-quota"
+page_title: "Cloud Foundry: cf_org_quota"
+sidebar_current: "docs-cf-resource-org-quota"
 description: |-
   Provides a Cloud Foundry Quota resource.
 ---
 
-# cf\_quota
+# cf\_org\_quota
 
-Provides a Cloud Foundry resource to manage org or space [quotas](https://docs.cloudfoundry.org/adminguide/quota-plans.html) definitions.
+Provides a Cloud Foundry resource to manage org [quotas](https://docs.cloudfoundry.org/adminguide/quota-plans.html) definitions.
 
 ~> **NOTE:** This resource requires the provider to be authenticated with an account granted admin permissions.
 
@@ -18,7 +18,7 @@ Provides a Cloud Foundry resource to manage org or space [quotas](https://docs.c
 The following example creates a quota that can be applied to an Org.
 
 ```
-resource "cf_quota" "large" {
+resource "cf_org_quota" "large" {
     name = "large"
     allow_paid_service_plans = false
     instance_memory = 2048
@@ -30,20 +30,6 @@ resource "cf_quota" "large" {
 }
 ```
 
-The following example creates a quota within an Org referenced by `cf_org.myorg.id` that can be applied to any space within that Org.
-
-```
-resource "cf_quota" "10g" {
-    name = "10g"
-    allow_paid_service_plans = false
-    instance_memory = 512
-    total_memory = 10240
-    total_app_instances = 10
-    total_routes = 5
-    total_services = 20
-    org = "${cf_org.myorg.id}"
-}
-```
 
 ## Argument Reference
 
@@ -58,7 +44,6 @@ The following arguments are supported:
 * `total_services` - (Required) Maximum services allowed
 * `total_route_ports` - (Optional) Maximum routes with reserved ports
 * `total_private_domains` - (Optional) Maximum number of private domains allowed to be created within the Org
-* `org` - (Optional) The Org within which this quota will be defined so it can be applied to spaces within that Org
 
 ## Attributes Reference
 
@@ -71,5 +56,5 @@ The following attributes are exported:
 The current Quota can be imported using the `quota`, e.g.
 
 ```
-$ terraform import cf_quota.10g a-guid
+$ terraform import cf_org_quota.10g a-guid
 ```

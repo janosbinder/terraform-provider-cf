@@ -7,29 +7,23 @@ import (
 	"github.com/terraform-providers/terraform-provider-cf/cloudfoundry/cfapi"
 )
 
-func dataSourceQuota() *schema.Resource {
-
+func dataSourceSpaceQuota() *schema.Resource {
 	return &schema.Resource{
-
-		Read: dataSourceQuotaRead,
-
+		Read: dataSourceSpaceQuotaRead,
 		Schema: map[string]*schema.Schema{
-
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 			"org": &schema.Schema{
 				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "",
+				Required: true,
 			},
 		},
 	}
 }
 
-func dataSourceQuotaRead(d *schema.ResourceData, meta interface{}) (err error) {
-
+func dataSourceSpaceQuotaRead(d *schema.ResourceData, meta interface{}) (err error) {
 	session := meta.(*cfapi.Session)
 	if session == nil {
 		return fmt.Errorf("client is nil")
@@ -41,16 +35,10 @@ func dataSourceQuotaRead(d *schema.ResourceData, meta interface{}) (err error) {
 	)
 
 	name = d.Get("name").(string)
-	if v, ok := d.GetOk("org"); ok {
-		org = v.(string)
-	}
+	org = d.Get("org").(string)
 
 	qm := session.QuotaManager()
-	if len(org) > 0 {
-		quota, err = qm.FindSpaceQuota(name, org)
-	} else {
-		quota, err = qm.FindQuota(name)
-	}
+	quota, err = qm.FindQuotaByName(cfapi.SpaceQuota, name, &org)
 	if err != nil {
 		return err
 	}

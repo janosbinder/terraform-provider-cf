@@ -1,26 +1,26 @@
 package cloudfoundry
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 )
 
-func TestAccQuota_importBasic(t *testing.T) {
-	resourceName := "cf_quota.50g"
-	quotaname := "50g"
+func TestAccSpaceQuota_importBasic(t *testing.T) {
+	resourceName := "cf_space_quota.10g-space"
+	quotaname := "10g-space"
+	orgID := defaultPcfDevOrgID()
 
 	resource.Test(t,
 		resource.TestCase{
 			PreCheck:     func() { testAccPreCheck(t) },
 			Providers:    testAccProviders,
-			CheckDestroy: testAccCheckQuotaResourceDestroy(quotaname),
+			CheckDestroy: testAccCheckSpaceQuotaResourceDestroy(quotaname),
 			Steps: []resource.TestStep{
-
 				resource.TestStep{
-					Config: quotaResource,
+					Config: fmt.Sprintf(spaceQuotaResource, orgID),
 				},
-
 				resource.TestStep{
 					ResourceName:      resourceName,
 					ImportState:       true,
