@@ -8,7 +8,10 @@ description: |-
 
 # cf\_config
 
-Provides a Cloud Foundry configuration resource for managing Cloud Foundry [feature](https://docs.cloudfoundry.org/adminguide/listing-feature-flags.html) flags. 
+Provides a Cloud Foundry configuration resource for managing Cloud Foundry [feature](https://docs.cloudfoundry.org/adminguide/listing-feature-flags.html) flags.
+
+~> **NOTE:** This resource requires the provider to be authenticated with an account granted admin permissions.
+ 
 
 ## Example Usage
 
@@ -58,7 +61,7 @@ When not provided, optional fields are filled with their actual value in Cloud F
 
 ## Import
 
-The current Config can be imported using the `config`, e.g.
+The current Config can be imported using the `config` constant, e.g.
 
 ```
 $ terraform import cf_config.config config
