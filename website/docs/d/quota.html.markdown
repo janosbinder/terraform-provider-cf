@@ -26,7 +26,7 @@ data "cf_quota" "q" {
 The following arguments are supported:
 
 * `name` - (Required) The name of the quota to look up
-* `org` - (Optional) The organization within which the quota is defined
+* `org` - (Optional) The organization within which the quota is defined. Defaults to empty string.
 
 ## Attributes Reference
 

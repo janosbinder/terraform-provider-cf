@@ -37,7 +37,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the Service Key in Cloud Foundry.
 * `service_instance` - (Required) The ID of the Service Instance the key should be associated with.
-* `params` - (Optional, Map) A list of key/value parameters used by the service broker to create the binding for the key.
+* `params` - (Optional, Map) A list of key/value parameters used by the service broker to create the binding for the key. Defaults to empty map.
 
 ## Attributes Reference
 

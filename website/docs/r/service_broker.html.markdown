@@ -29,9 +29,9 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the service broker
 * `url` - (Required) The URL that provides the service broker [API](https://docs.cloudfoundry.org/services/api.html)
-* `username` - (Optional) The user name to use to authenticate against the service broker API calls
-* `password` - (Optional) The password to authenticate with
-* `space` - (Optional) The ID of the space to scope this broker to
+* `username` - (Required) The user name to use to authenticate against the service broker API calls
+* `password` - (Required) The password to authenticate with
+* `space` - (Optional) The ID of the space to scope this broker to. If provided, service broker will be space-scoped.
 
 ## Attributes Reference
 

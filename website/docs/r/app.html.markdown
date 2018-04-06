@@ -27,17 +27,17 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the application in Cloud Foundry space.
 * `space` - (Required) The GUID of the associated space.
-* `ports` - (Optional, Array of Number) A list of ports which the app will listen on.
-* `instances` - (Optional, Number) The number of app instances that you want to start.
-* `memory` - (Optional, Number) The memory limit for each application instance in megabytes.
-* `disk_quota` - (Optional, Number) The disk space to be allocated for each application instance in megabytes.
-* `stack` - (Optional) The GUID of the stack the application will be deployed to. Use the [`cf_stack`](/docs/providers/cf/d/stack.html) data resource to lookup the stack GUID to overriding the default.
+* `ports` - (Optional, Array of Number) A list of ports which the app will listen on. If not provided, value is computed and retreived from Cloud Foundry.
+* `instances` - (Optional, Number) The number of app instances that you want to start. Defaults to 1.
+* `memory` - (Optional, Number) The memory limit for each application instance in megabytes. If not provided, value is computed and retreived from Cloud Foundry.
+* `disk_quota` - (Optional, Number) The disk space to be allocated for each application instance in megabytes. If not provided, value is computed and retreived from Cloud Foundry.
+* `stack` - (Optional) The GUID of the stack the application will be deployed to. Use the [`cf_stack`](/docs/providers/cf/d/stack.html) data resource to lookup the stack GUID to override Cloud Foundry default.
 * `buildpack` - (Optional, String) The custom buildpack to use. This will bypass the buildpack detect phase. There are three options to choose from:
-a) Blank means autodetection; b) A Git Url pointing to a buildpack; c) Name of an installed admin buildpack.
+a) Blank/not provided means autodetection; b) A Git Url pointing to a buildpack; c) Name of an installed admin buildpack.
 * `command` - (Optional, String) A custom start command for the application. This overrides the start command provided by the buildpack.
 * `enable_ssh` - (Optional, Boolean) Whether to enable or disable SSH access to the container. Default is `true` unless disabled globally.
-* `timeout` - (Optional, Number) Defines the number of seconds that Cloud Foundry waits for starting your application.
-* `stopped` - (Optional, Boolean) The application will be created and remain in an stopped state. Default is to stage and start the application.
+* `timeout` - (Optional, Number) Defines the number of seconds that Cloud Foundry waits for starting your application. Defaults to 60s.
+* `stopped` - (Optional, Boolean) The application will be created and remain in an stopped state. Defaults to false (ie. stage and start the application).
 
 ### Application Source / Binary
 
@@ -76,7 +76,7 @@ Modifying this argument will cause the application to be restaged.
 * `service_binding` - (Optional, Array) Service instances to bind to.
 
   - `service` - (Required, String) The service instance GUID.
-  - `params` - (Optional, Map) A list of key/value parameters used by the service broker to create the binding.
+  - `params` - (Optional, Map) A list of key/value parameters used by the service broker to create the binding. Defaults to empty map.
 
 ### Routing and Blue-Green Deployment Strategy
 
@@ -94,7 +94,7 @@ Modifying this argument will cause the application to be restaged.
 
 Modifying this argument will cause the application to be restaged.
 
-* `environment` - (Optional, Map) Key/value pairs of all the environment variables to run in your app. Does not include any system or service variables.
+* `environment` - (Optional, Map) Key/value pairs of all the environment variables to run in your app. Does not include any system or service variables. Defaults to empty map.
 
 ### Health Checks
 
